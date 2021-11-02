@@ -8,17 +8,17 @@
   <link rel="dns-prefetch" href="http://yoursite.com">
   <title>Mybatis sql语句执行流程分析 | CodeExplorer的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="sql解析之后，就到了重要的sql执行流程了， 由上一篇配置文件和sql语句的解析，得到了sqlSessionFactory对象，这是创建sqlSession的工厂类，而sqlSession就是mybatis提供的、面向用户的api，是mybatis与数据库交互的接口。 sqlSession 类结构如下：   可以看到sqlSession提供了select，insert，update，delete">
+  <meta name="description" content="sql解析之后，就到了重要的sql执行流程了， 由上一篇配置文件和sql语句的解析，得到了sqlSessionFactory对象，这是创建sqlSession的工厂类，而sqlSession就是mybatis提供的、面向用户的api，是mybatis与数据库交互的接口。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Mybatis sql语句执行流程分析">
 <meta property="og:url" content="http://yoursite.com/2021/10/29/Mybatis%20sql%E8%AF%AD%E5%8F%A5%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E5%88%86%E6%9E%90/index.html">
 <meta property="og:site_name" content="CodeExplorer的博客">
-<meta property="og:description" content="sql解析之后，就到了重要的sql执行流程了， 由上一篇配置文件和sql语句的解析，得到了sqlSessionFactory对象，这是创建sqlSession的工厂类，而sqlSession就是mybatis提供的、面向用户的api，是mybatis与数据库交互的接口。 sqlSession 类结构如下：   可以看到sqlSession提供了select，insert，update，delete">
+<meta property="og:description" content="sql解析之后，就到了重要的sql执行流程了， 由上一篇配置文件和sql语句的解析，得到了sqlSessionFactory对象，这是创建sqlSession的工厂类，而sqlSession就是mybatis提供的、面向用户的api，是mybatis与数据库交互的接口。">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://gitee.com/codeexplorer/oss/raw/master/uPic/SqlSession%E7%B1%BB%E7%BB%93%E6%9E%84.png">
 <meta property="og:image" content="https://gitee.com/codeexplorer/oss/raw/master/uPic/image-20211029161859653-20211029161955267.png">
 <meta property="article:published_time" content="2021-10-29T07:55:19.447Z">
-<meta property="article:modified_time" content="2021-10-29T09:19:05.689Z">
+<meta property="article:modified_time" content="2021-11-02T09:13:22.885Z">
 <meta property="article:author" content="CodeExplorer">
 <meta property="article:tag" content="Java，开发者，程序猿">
 <meta name="twitter:card" content="summary">
@@ -183,6 +183,8 @@
     <div class="article-entry" itemprop="articleBody">
       
         <p>sql解析之后，就到了重要的sql执行流程了， 由上一篇配置文件和sql语句的解析，得到了sqlSessionFactory对象，这是创建sqlSession的工厂类，而sqlSession就是mybatis提供的、面向用户的api，是mybatis与数据库交互的接口。</p>
+<a id="more"></a>
+
 <p>sqlSession 类结构如下：</p>
 <img src="https://gitee.com/codeexplorer/oss/raw/master/uPic/SqlSession类结构.png" style="zoom:50%;" />
 

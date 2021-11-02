@@ -180,95 +180,9 @@
     <div class="article-entry" itemprop="articleBody">
       
         <h6 id="JVM整体结构及内存模型"><a href="#JVM整体结构及内存模型" class="headerlink" title="JVM整体结构及内存模型"></a>JVM整体结构及内存模型</h6><p><img src="https://gitee.com/codeexplorer/oss/raw/master/uPic/JVM%E7%BB%84%E4%BB%B6%E5%9B%BE.png" alt=""></p>
-<ul>
-<li><p>堆：存储对象 java..lang.Class，线程共享区域</p>
-</li>
-<li><p>方法区：JDK8之后称为元空间（Meta Space）类信息，常量池，静态变量，线程共享区域</p>
-<ul>
-<li>常量池：存储符号引用和静态常量</li>
-</ul>
-</li>
-<li><p>栈：又称虚拟机栈，线程私有， 保存一个线程中方法的调用状态</p>
-<ul>
-<li><p>栈帧：每个方法对应一个栈帧，每当一个方法执行，就会向虚拟机栈中压入一个栈帧</p>
-<p><img src="https://gitee.com/codeexplorer/oss/raw/master/uPic/%E6%96%B9%E6%B3%95%E6%89%A7%E8%A1%8C%E6%A0%88%E5%B8%A7%E8%B0%83%E7%94%A8%E5%9B%BE.png" alt=""></p>
-<p>每个栈帧包括局部变量表，操作数栈，动态链接，方法返回地址。</p>
-<img src="/Users/suhaoran/Pictures/笔记图片/栈帧.png" style="zoom:25%;" />
-
-<ul>
-<li>局部变量表：Local Variables，存储方法中的局部变量和参数，不能直接使用，必须通过指令加载到操作数栈中使用</li>
-<li>操作数栈：Operand Stack，方法执行时，将使用的局部变量以入栈和出栈的方式存储</li>
-<li>方法返回地址：存放该方法的程序计数器的值。方法的退出只有两种方式：1正常退出；2：出现异常</li>
-<li>动态链接：指向方法区运行时常量池的引用</li>
-</ul>
-</li>
-<li><p>本地方法栈：顾名思义，是本地方法的运行空间，本地方法指JVM自己的方法，通过C++实现，java中native修饰的方法都是本地方法。 java调用本地方法，也是通过虚拟机栈的动态链接指向本地方法栈。</p>
-</li>
-<li><p>程序计数器，记录线程执行的位置，java方法记录字节码指令的地址，本地方法为空。</p>
-</li>
-</ul>
-</li>
-</ul>
-<p>#####JAVA类加载流程</p>
-<ol>
-<li>加载：硬盘上查找并读取字节码文件，将类的静态存储结构存入方法区中，在堆中生成java.lang.Class对象，作为方法区中该类各种数据的访问入口。类只有在使用时才会加载，比如运行main方法，new对象等。</li>
-<li>验证：校验字节码文件的正确性。</li>
-<li>准备：给静态变量分配内存，赋予初始值，注意，这里并不是真正的赋值。</li>
-<li>解析：将符号引用替换为直接引用，比如将静态方法替换为指向内存的指针或者句柄，这是静态链接；动态链接是在程序运行期间将符号引用替换为直接引用。</li>
-<li>初始化：给静态变量赋真正指定的值，并且运行静态代码块。</li>
-</ol>
-<h5 id="JAVA类加载器"><a href="#JAVA类加载器" class="headerlink" title="JAVA类加载器"></a>JAVA类加载器</h5><p>Java类的加载是通过类加载器实现的，类加载器有以下几种：</p>
-<ul>
-<li>BootStrap ClassLoader，启动类加载器，负责加载jre/lib目录下的核心类库，比如rt.jar，charsets.jar等</li>
-<li>Extension ClassLoader：扩展类加载器，负责加载jre/lib/ext目录下的jar包和-Djava.ext.dirs指定目录下的jar包。</li>
-<li>App ClassLoader：应用类加载器，负责加载ClassPath目录下的jar包，主要就是自己编写的类</li>
-<li>Custome ClassLoader：自定义类加载器，继承java.lang.CLassLoader的自定义类加载器，应用程序根据自身规范自定义加载类，比如tomcat，jboss都实现了自定义类加载器。</li>
-</ul>
-<p><strong><em>注意，Java中扩展类加载器的父加载器并不是启动类加载器，而是null，在类加载过程中，如果当前类加载器的父加载器为null，那么就会调用启动类加载器尝试加载，这是又JVM底层C++代码实现的。</em></strong></p>
-<p><img src="https://gitee.com/codeexplorer/oss/raw/master/uPic/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8.png" alt=""></p>
-<h5 id="类加载原则"><a href="#类加载原则" class="headerlink" title="类加载原则"></a>类加载原则</h5><ol>
-<li>检查是否已经加载，自底而上，从Custom ClassLoader到BootStrap ClassLoader逐次检查是否加载过此类，只要还有一个加载器，就是为此类已加载，保证此类不会重复加载</li>
-<li>加载顺序，自上而下，逐级尝试加载，有一个类加载器成功加载，该类就加载成功</li>
-</ol>
-<p>类加载器，主要有两个方法loadClass和findClass，其中loadClass方法就是双亲委派机制的实现，findClass是类加载的实现，代码如下：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> Class&lt;?&gt; loadClass(String name, <span class="keyword">boolean</span> resolve)</span><br><span class="line">       <span class="keyword">throws</span> ClassNotFoundException</span><br><span class="line">   &#123;</span><br><span class="line">       <span class="keyword">synchronized</span> (getClassLoadingLock(name)) &#123;</span><br><span class="line">           <span class="comment">// First, check if the class has already been loaded</span></span><br><span class="line">         <span class="comment">// 检查是否已经加载过此类</span></span><br><span class="line">           Class&lt;?&gt; c = findLoadedClass(name);</span><br><span class="line">           <span class="keyword">if</span> (c == <span class="keyword">null</span>) &#123;</span><br><span class="line">               <span class="keyword">long</span> t0 = System.nanoTime();</span><br><span class="line">               <span class="keyword">try</span> &#123;</span><br><span class="line">                 <span class="comment">// 没有加载，是否有父加载器</span></span><br><span class="line">                   <span class="keyword">if</span> (parent != <span class="keyword">null</span>) &#123;</span><br><span class="line">                     <span class="comment">// 递归调用父加载器的loadClass方法，同样的逻辑</span></span><br><span class="line">                       c = parent.loadClass(name, <span class="keyword">false</span>);</span><br><span class="line">                   &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                     <span class="comment">// 父加载器为null，说明是扩展类加载器，尝试使用BootStrap ClassLoader加载</span></span><br><span class="line">                       c = findBootstrapClassOrNull(name);</span><br><span class="line">                   &#125;</span><br><span class="line">               &#125; <span class="keyword">catch</span> (ClassNotFoundException e) &#123;</span><br><span class="line">                   <span class="comment">// ClassNotFoundException thrown if class not found</span></span><br><span class="line">                   <span class="comment">// from the non-null parent class loader</span></span><br><span class="line">               &#125;</span><br><span class="line">							<span class="comment">// 如果为null，说明父加载器加载该类失败，调用当前类加载器的findClass方法</span></span><br><span class="line">               <span class="keyword">if</span> (c == <span class="keyword">null</span>) &#123;</span><br><span class="line">                   <span class="comment">// If still not found, then invoke findClass in order</span></span><br><span class="line">                   <span class="comment">// to find the class.</span></span><br><span class="line">                   <span class="keyword">long</span> t1 = System.nanoTime();</span><br><span class="line">                   c = findClass(name);</span><br><span class="line"></span><br><span class="line">                   <span class="comment">// this is the defining class loader; record the stats</span></span><br><span class="line">                   sun.misc.PerfCounter.getParentDelegationTime().addTime(t1 - t0);</span><br><span class="line">                   sun.misc.PerfCounter.getFindClassTime().addElapsedTimeFrom(t1);</span><br><span class="line">                   sun.misc.PerfCounter.getFindClasses().increment();</span><br><span class="line">               &#125;</span><br><span class="line">           &#125;</span><br><span class="line">           <span class="keyword">if</span> (resolve) &#123;</span><br><span class="line">               resolveClass(c);</span><br><span class="line">           &#125;</span><br><span class="line">           <span class="keyword">return</span> c;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
-
-
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> Class&lt;?&gt; findClass(<span class="keyword">final</span> String name)</span><br><span class="line">       <span class="keyword">throws</span> ClassNotFoundException</span><br><span class="line">   &#123;</span><br><span class="line">       <span class="keyword">final</span> Class&lt;?&gt; result;</span><br><span class="line">       <span class="keyword">try</span> &#123;</span><br><span class="line">           result = AccessController.doPrivileged(</span><br><span class="line">               <span class="keyword">new</span> PrivilegedExceptionAction&lt;Class&lt;?&gt;&gt;() &#123;</span><br><span class="line">                   <span class="keyword">public</span> Class&lt;?&gt; run() <span class="keyword">throws</span> ClassNotFoundException &#123;</span><br><span class="line">                     <span class="comment">// 获取当前类的路径</span></span><br><span class="line">                       String path = name.replace(<span class="string">'.'</span>, <span class="string">'/'</span>).concat(<span class="string">".class"</span>);</span><br><span class="line">                     <span class="comment">// 根据类路径生成资源文件</span></span><br><span class="line">                       Resource res = ucp.getResource(path, <span class="keyword">false</span>);</span><br><span class="line">                       <span class="keyword">if</span> (res != <span class="keyword">null</span>) &#123;</span><br><span class="line">                           <span class="keyword">try</span> &#123;</span><br><span class="line">                             <span class="comment">// 加载类</span></span><br><span class="line">                               <span class="keyword">return</span> defineClass(name, res);</span><br><span class="line">                           &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">                               <span class="keyword">throw</span> <span class="keyword">new</span> ClassNotFoundException(name, e);</span><br><span class="line">                           &#125;</span><br><span class="line">                       &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                           <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">                       &#125;</span><br><span class="line">                   &#125;</span><br><span class="line">               &#125;, acc);</span><br><span class="line">       &#125; <span class="keyword">catch</span> (java.security.PrivilegedActionException pae) &#123;</span><br><span class="line">           <span class="keyword">throw</span> (ClassNotFoundException) pae.getException();</span><br><span class="line">       &#125;</span><br><span class="line">       <span class="keyword">if</span> (result == <span class="keyword">null</span>) &#123;</span><br><span class="line">           <span class="keyword">throw</span> <span class="keyword">new</span> ClassNotFoundException(name);</span><br><span class="line">       &#125;</span><br><span class="line">       <span class="keyword">return</span> result;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
-
-<p>由以上代码可以看出，如果要实现自定义类加载器加载类：</p>
-<ol>
-<li>继承java.lang.CLassLoader</li>
-<li>不破坏双亲委派机制：重写findClass方法</li>
-<li>打破双亲委派机制：重写loadClass方法</li>
-</ol>
-<h5 id="为什么要实现双亲委派"><a href="#为什么要实现双亲委派" class="headerlink" title="为什么要实现双亲委派"></a>为什么要实现双亲委派</h5><ol>
-<li>沙箱安全：自己写的、与核心类同名的类不会被加载，避免核心类库不会被篡改，保证安全</li>
-<li>避免重复加载：当父加载器已经加载过，没有必要重新加载一遍，保证被加载类的唯一性。</li>
-</ol>
-<h5 id="为什么要打破双亲委派"><a href="#为什么要打破双亲委派" class="headerlink" title="为什么要打破双亲委派"></a>为什么要打破双亲委派</h5><p>试想一下，有没有一种场景，同名的类就是有不同的版本需要加载呢？</p>
-<p>Tomcat就是一个典型的场景，Tomcat是一个web容器，他要解决什么问题：</p>
-<ol>
-<li>一个web容器可能部署多个应用，不同的应用程序可能依赖同一个第三方库的不同版本，因此，第三方库不能只加载一份，需要加载多份，并且相互隔离</li>
-<li>不同应用程序依赖的相同版本的类库，也需要同时加载多次</li>
-<li>Tomcat自己依赖的jar包，不能与应用程序依赖的jar包混淆。基于安全考虑，Tomcat依赖的jar包需要个应用程序依赖的jar包相互隔离</li>
-<li>Tomcat支持jsp修改，jsp修改后，Tomcat不需要重启就能生效</li>
-</ol>
-<p>如果使用双亲委派机制，Tomcat这些问题解决不了，所以，Tomcat的类加载器打破了双亲委派机制</p>
-<img src="https://gitee.com/codeexplorer/oss/raw/master/uPic/Tomcat类加载器.png" />
-
-
-
-<p>Tomcat主要的类加载器：</p>
-<ul>
-<li>CommonClassLoader：Tomcat最基本的类加载器，加载的class可以被容器和webapp同时访问</li>
-<li>atalinaClassLoader：Tomcat容器私有的类加载器，加载的class可以被容器访问，不能被webapp访问</li>
-<li>SharedClassLoader：各个webapp共享的类加载器，加载的class对于容器不可见，对所有的webapp可见</li>
-<li>WebappClassLoader: 各个webapp私有的类加载器，加载的class只对当前webapp可见</li>
-<li>JspClassLoader：每个jsp文件都对应一个JspClassLoader，当Tomcat检测到jsp文件修改，会删除当前JspClassLoader，创建一个新的JspClassLoader加载jsp文件</li>
-</ul>
-
+        
+          <a class="article-more-a" href="/2021/11/02/Jvm%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B%E5%92%8C%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/#more">more >></a>
+        
       
 
       
@@ -331,32 +245,9 @@
     <div class="article-entry" itemprop="articleBody">
       
         <p>sql解析之后，就到了重要的sql执行流程了， 由上一篇配置文件和sql语句的解析，得到了sqlSessionFactory对象，这是创建sqlSession的工厂类，而sqlSession就是mybatis提供的、面向用户的api，是mybatis与数据库交互的接口。</p>
-<p>sqlSession 类结构如下：</p>
-<img src="https://gitee.com/codeexplorer/oss/raw/master/uPic/SqlSession类结构.png" style="zoom:50%;" />
-
-<p>可以看到sqlSession提供了select，insert，update，delete等方法，sqlSession是Executor的门面，底层使用的都是Executor的update和select方法。</p>
-<p>SqlSessionFactory#openSession()方法创建SqlSession, 代码如下：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> SqlSession <span class="title">openSessionFromDataSource</span><span class="params">(ExecutorType execType, TransactionIsolationLevel level, <span class="keyword">boolean</span> autoCommit)</span> </span>&#123;</span><br><span class="line">  Transaction tx = <span class="keyword">null</span>;</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="comment">// 获取当前数据库环境信息</span></span><br><span class="line">    <span class="keyword">final</span> Environment environment = configuration.getEnvironment();</span><br><span class="line">    <span class="comment">// 创建事务工厂</span></span><br><span class="line">    <span class="keyword">final</span> TransactionFactory transactionFactory = getTransactionFactoryFromEnvironment(environment);</span><br><span class="line">    <span class="comment">// 创建事务管理器</span></span><br><span class="line">    tx = transactionFactory.newTransaction(environment.getDataSource(), level, autoCommit);</span><br><span class="line">    <span class="comment">// 创建执行器executor</span></span><br><span class="line">    <span class="keyword">final</span> Executor executor = configuration.newExecutor(tx, execType);</span><br><span class="line">    <span class="comment">// 创建sqlSession</span></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> DefaultSqlSession(configuration, executor, autoCommit);</span><br><span class="line">  &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">    closeTransaction(tx); <span class="comment">// may have fetched a connection so lets call close()</span></span><br><span class="line">    <span class="keyword">throw</span> ExceptionFactory.wrapException(<span class="string">"Error opening session.  Cause: "</span> + e, e);</span><br><span class="line">  &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">    ErrorContext.instance().reset();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>执行器创建代码：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Executor <span class="title">newExecutor</span><span class="params">(Transaction transaction, ExecutorType executorType)</span> </span>&#123;</span><br><span class="line">  <span class="comment">// 确定执行器类型，默认是simple</span></span><br><span class="line">  executorType = executorType == <span class="keyword">null</span> ? defaultExecutorType : executorType;</span><br><span class="line">  executorType = executorType == <span class="keyword">null</span> ? ExecutorType.SIMPLE : executorType;</span><br><span class="line">  Executor executor;</span><br><span class="line"> </span><br><span class="line">  <span class="keyword">if</span> (ExecutorType.BATCH == executorType) &#123;</span><br><span class="line">    executor = <span class="keyword">new</span> BatchExecutor(<span class="keyword">this</span>, transaction);</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (ExecutorType.REUSE == executorType) &#123;</span><br><span class="line">    executor = <span class="keyword">new</span> ReuseExecutor(<span class="keyword">this</span>, transaction);</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    executor = <span class="keyword">new</span> SimpleExecutor(<span class="keyword">this</span>, transaction);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 是否开启二级缓存</span></span><br><span class="line">  <span class="keyword">if</span> (cacheEnabled) &#123;</span><br><span class="line">    <span class="comment">// 创建CachingExecutor</span></span><br><span class="line">    executor = <span class="keyword">new</span> CachingExecutor(executor);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// </span></span><br><span class="line">  executor = (Executor) interceptorChain.pluginAll(executor);</span><br><span class="line">  <span class="keyword">return</span> executor;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>Executor分为两大类，一类是CachingExecutor，另一类是普通Executor，普通Executor又分为三种Simple，Reuse，Batch，三者都继承自Base Executor</p>
-<ul>
-<li>SimpleExecutor：Mybatis默认执行器，没执行一次select或者update，就开启Statement对象，执行完就关闭</li>
-<li>ReuseExecutor：可重用执行器，执行update或者select是，根据sql查找Statement对象，找到就重复利用，找不到就创建</li>
-<li>BatchExecutor：执行update时，将所有sql添加到批处理中 addbatch()，等待统一追星executeBatch()，缓存多个Statement对象，每隔对象都是addBatch()之后，等待逐一执行executebatch()，与JDBC批处理相同。select不能批处理</li>
-</ul>
-<p><img src="https://gitee.com/codeexplorer/oss/raw/master/uPic/image-20211029161859653-20211029161955267.png" alt="image-20211029161859653"></p>
-<p>CachingExecutor其实就是封装了普通Executor的执行器，区别就是查询的时候先查询二级缓存中的数据，没有就调用普通执行器查询，普通执行器没有实现查询方法，调用父类BaseEcecutor的查询，先查询一级缓存，没有查询数据库，并存入缓存。</p>
-<p>#简单总结</p>
-<ul>
-<li>执行sql语句最终会进入Executor组件（如果配置插件，会对Executor进行动态代理）的doQuery方法，这个方法会创建一个StatementHandler对象，此对象同时封装ParameterHandler和ResultSethandler对象，调用预编译逻辑，ParameterHandler给sql设置参数</li>
-<li>Executor组件有两个直接实现类，分别是BaseExecutor和 CachingExecutor。CachingExecutor静态代理了BaseExecutor。Executor 组件封装了Transction组件，Transction组件中又分装了Datasource组件。</li>
-<li>调用StatementHandler的增删改查方法获得结果，ResultSetHandler 对结果进行封装转换，请求结束。</li>
-<li>Executor、StatementHandler 、ParameterHandler、 ResultSetHandler，Mybatis的插件会对上面的四个组件进行动态代理。</li>
-</ul>
-
+        
+          <a class="article-more-a" href="/2021/10/29/Mybatis%20sql%E8%AF%AD%E5%8F%A5%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E5%88%86%E6%9E%90/#more">more >></a>
+        
       
 
       

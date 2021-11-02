@@ -8,12 +8,12 @@
   <link rel="dns-prefetch" href="http://yoursite.com">
   <title>Jvm内存模型和类加载机制 | CodeExplorer的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="JVM整体结构及内存模型  堆：存储对象 java..lang.Class，线程共享区域  方法区：JDK8之后称为元空间（Meta Space）类信息，常量池，静态变量，线程共享区域  常量池：存储符号引用和静态常量   栈：又称虚拟机栈，线程私有， 保存一个线程中方法的调用状态  栈帧：每个方法对应一个栈帧，每当一个方法执行，就会向虚拟机栈中压入一个栈帧  每个栈帧包括局部变量表，操作数栈，动">
+  <meta name="description" content="JVM整体结构及内存模型">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Jvm内存模型和类加载机制">
 <meta property="og:url" content="http://yoursite.com/2021/11/02/Jvm%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B%E5%92%8C%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/index.html">
 <meta property="og:site_name" content="CodeExplorer的博客">
-<meta property="og:description" content="JVM整体结构及内存模型  堆：存储对象 java..lang.Class，线程共享区域  方法区：JDK8之后称为元空间（Meta Space）类信息，常量池，静态变量，线程共享区域  常量池：存储符号引用和静态常量   栈：又称虚拟机栈，线程私有， 保存一个线程中方法的调用状态  栈帧：每个方法对应一个栈帧，每当一个方法执行，就会向虚拟机栈中压入一个栈帧  每个栈帧包括局部变量表，操作数栈，动">
+<meta property="og:description" content="JVM整体结构及内存模型">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://gitee.com/codeexplorer/oss/raw/master/uPic/JVM%E7%BB%84%E4%BB%B6%E5%9B%BE.png">
 <meta property="og:image" content="https://gitee.com/codeexplorer/oss/raw/master/uPic/%E6%96%B9%E6%B3%95%E6%89%A7%E8%A1%8C%E6%A0%88%E5%B8%A7%E8%B0%83%E7%94%A8%E5%9B%BE.png">
@@ -21,7 +21,7 @@
 <meta property="og:image" content="https://gitee.com/codeexplorer/oss/raw/master/uPic/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8.png">
 <meta property="og:image" content="https://gitee.com/codeexplorer/oss/raw/master/uPic/Tomcat%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8.png">
 <meta property="article:published_time" content="2021-11-02T01:11:10.615Z">
-<meta property="article:modified_time" content="2021-11-02T08:52:21.155Z">
+<meta property="article:modified_time" content="2021-11-02T09:13:46.254Z">
 <meta property="article:author" content="CodeExplorer">
 <meta property="article:tag" content="Java，开发者，程序猿">
 <meta name="twitter:card" content="summary">
@@ -186,6 +186,8 @@
     <div class="article-entry" itemprop="articleBody">
       
         <h6 id="JVM整体结构及内存模型"><a href="#JVM整体结构及内存模型" class="headerlink" title="JVM整体结构及内存模型"></a>JVM整体结构及内存模型</h6><p><img src="https://gitee.com/codeexplorer/oss/raw/master/uPic/JVM%E7%BB%84%E4%BB%B6%E5%9B%BE.png" alt=""></p>
+<a id="more"></a>
+
 <ul>
 <li><p>堆：存储对象 java..lang.Class，线程共享区域</p>
 </li>
