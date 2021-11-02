@@ -6,18 +6,23 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Archives | CodeExplorer的博客</title>
+  <title>Mybatis sql语句执行流程分析 | CodeExplorer的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="Java码农一枚，技术不咋地。">
-<meta property="og:type" content="website">
-<meta property="og:title" content="CodeExplorer的博客">
-<meta property="og:url" content="http://yoursite.com/archives/index.html">
+  <meta name="description" content="sql解析之后，就到了重要的sql执行流程了， 由上一篇配置文件和sql语句的解析，得到了sqlSessionFactory对象，这是创建sqlSession的工厂类，而sqlSession就是mybatis提供的、面向用户的api，是mybatis与数据库交互的接口。 sqlSession 类结构如下：   可以看到sqlSession提供了select，insert，update，delete">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Mybatis sql语句执行流程分析">
+<meta property="og:url" content="http://yoursite.com/2021/10/29/Mybatis%20sql%E8%AF%AD%E5%8F%A5%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E5%88%86%E6%9E%90/index.html">
 <meta property="og:site_name" content="CodeExplorer的博客">
-<meta property="og:description" content="Java码农一枚，技术不咋地。">
+<meta property="og:description" content="sql解析之后，就到了重要的sql执行流程了， 由上一篇配置文件和sql语句的解析，得到了sqlSessionFactory对象，这是创建sqlSession的工厂类，而sqlSession就是mybatis提供的、面向用户的api，是mybatis与数据库交互的接口。 sqlSession 类结构如下：   可以看到sqlSession提供了select，insert，update，delete">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://gitee.com/codeexplorer/oss/raw/master/uPic/SqlSession%E7%B1%BB%E7%BB%93%E6%9E%84.png">
+<meta property="og:image" content="https://gitee.com/codeexplorer/oss/raw/master/uPic/image-20211029161859653-20211029161955267.png">
+<meta property="article:published_time" content="2021-10-29T07:55:19.447Z">
+<meta property="article:modified_time" content="2021-10-29T09:19:05.689Z">
 <meta property="article:author" content="CodeExplorer">
 <meta property="article:tag" content="Java，开发者，程序猿">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/codeexplorer/oss/raw/master/uPic/SqlSession%E7%B1%BB%E7%BB%93%E6%9E%84.png">
   
     <link rel="alternative" href="/atom.xml" title="CodeExplorer的博客" type="application/atom+xml">
   
@@ -157,113 +162,190 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-Mybatis sql语句执行流程分析" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2021" class="archive-year">2021</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2021/11/02/Jvm%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B%E5%92%8C%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/" class="archive-article-date">
-  	<time datetime="2021-11-02T01:11:10.615Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-11-02</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2021/11/02/Jvm%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B%E5%92%8C%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/">Jvm内存模型和类加载机制</a>
+    <h1 class="article-title" itemprop="name">
+      Mybatis sql语句执行流程分析
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2021/10/29/Mybatis%20sql%E8%AF%AD%E5%8F%A5%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E5%88%86%E6%9E%90/" class="archive-article-date">
+        
+        <a href="/2021/10/29/Mybatis%20sql%E8%AF%AD%E5%8F%A5%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E5%88%86%E6%9E%90/" class="archive-article-date">
   	<time datetime="2021-10-29T07:55:19.447Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2021-10-29</time>
 </a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2021/10/29/Mybatis%20sql%E8%AF%AD%E5%8F%A5%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E5%88%86%E6%9E%90/">Mybatis sql语句执行流程分析</a>
-    </h1>
-  
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>sql解析之后，就到了重要的sql执行流程了， 由上一篇配置文件和sql语句的解析，得到了sqlSessionFactory对象，这是创建sqlSession的工厂类，而sqlSession就是mybatis提供的、面向用户的api，是mybatis与数据库交互的接口。</p>
+<p>sqlSession 类结构如下：</p>
+<img src="https://gitee.com/codeexplorer/oss/raw/master/uPic/SqlSession类结构.png" style="zoom:50%;" />
 
-        <div class="article-info info-on-right">
-          
-          
+<p>可以看到sqlSession提供了select，insert，update，delete等方法，sqlSession是Executor的门面，底层使用的都是Executor的update和select方法。</p>
+<p>SqlSessionFactory#openSession()方法创建SqlSession, 代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> SqlSession <span class="title">openSessionFromDataSource</span><span class="params">(ExecutorType execType, TransactionIsolationLevel level, <span class="keyword">boolean</span> autoCommit)</span> </span>&#123;</span><br><span class="line">  Transaction tx = <span class="keyword">null</span>;</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="comment">// 获取当前数据库环境信息</span></span><br><span class="line">    <span class="keyword">final</span> Environment environment = configuration.getEnvironment();</span><br><span class="line">    <span class="comment">// 创建事务工厂</span></span><br><span class="line">    <span class="keyword">final</span> TransactionFactory transactionFactory = getTransactionFactoryFromEnvironment(environment);</span><br><span class="line">    <span class="comment">// 创建事务管理器</span></span><br><span class="line">    tx = transactionFactory.newTransaction(environment.getDataSource(), level, autoCommit);</span><br><span class="line">    <span class="comment">// 创建执行器executor</span></span><br><span class="line">    <span class="keyword">final</span> Executor executor = configuration.newExecutor(tx, execType);</span><br><span class="line">    <span class="comment">// 创建sqlSession</span></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> DefaultSqlSession(configuration, executor, autoCommit);</span><br><span class="line">  &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">    closeTransaction(tx); <span class="comment">// may have fetched a connection so lets call close()</span></span><br><span class="line">    <span class="keyword">throw</span> ExceptionFactory.wrapException(<span class="string">"Error opening session.  Cause: "</span> + e, e);</span><br><span class="line">  &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">    ErrorContext.instance().reset();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
+<p>执行器创建代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Executor <span class="title">newExecutor</span><span class="params">(Transaction transaction, ExecutorType executorType)</span> </span>&#123;</span><br><span class="line">  <span class="comment">// 确定执行器类型，默认是simple</span></span><br><span class="line">  executorType = executorType == <span class="keyword">null</span> ? defaultExecutorType : executorType;</span><br><span class="line">  executorType = executorType == <span class="keyword">null</span> ? ExecutorType.SIMPLE : executorType;</span><br><span class="line">  Executor executor;</span><br><span class="line"> </span><br><span class="line">  <span class="keyword">if</span> (ExecutorType.BATCH == executorType) &#123;</span><br><span class="line">    executor = <span class="keyword">new</span> BatchExecutor(<span class="keyword">this</span>, transaction);</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (ExecutorType.REUSE == executorType) &#123;</span><br><span class="line">    executor = <span class="keyword">new</span> ReuseExecutor(<span class="keyword">this</span>, transaction);</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    executor = <span class="keyword">new</span> SimpleExecutor(<span class="keyword">this</span>, transaction);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 是否开启二级缓存</span></span><br><span class="line">  <span class="keyword">if</span> (cacheEnabled) &#123;</span><br><span class="line">    <span class="comment">// 创建CachingExecutor</span></span><br><span class="line">    executor = <span class="keyword">new</span> CachingExecutor(executor);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// </span></span><br><span class="line">  executor = (Executor) interceptorChain.pluginAll(executor);</span><br><span class="line">  <span class="keyword">return</span> executor;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Executor分为两大类，一类是CachingExecutor，另一类是普通Executor，普通Executor又分为三种Simple，Reuse，Batch，三者都继承自Base Executor</p>
+<ul>
+<li>SimpleExecutor：Mybatis默认执行器，没执行一次select或者update，就开启Statement对象，执行完就关闭</li>
+<li>ReuseExecutor：可重用执行器，执行update或者select是，根据sql查找Statement对象，找到就重复利用，找不到就创建</li>
+<li>BatchExecutor：执行update时，将所有sql添加到批处理中 addbatch()，等待统一追星executeBatch()，缓存多个Statement对象，每隔对象都是addBatch()之后，等待逐一执行executebatch()，与JDBC批处理相同。select不能批处理</li>
+</ul>
+<p><img src="https://gitee.com/codeexplorer/oss/raw/master/uPic/image-20211029161859653-20211029161955267.png" alt="image-20211029161859653"></p>
+<p>CachingExecutor其实就是封装了普通Executor的执行器，区别就是查询的时候先查询二级缓存中的数据，没有就调用普通执行器查询，普通执行器没有实现查询方法，调用父类BaseEcecutor的查询，先查询一级缓存，没有查询数据库，并存入缓存。</p>
+<p>#简单总结</p>
+<ul>
+<li>执行sql语句最终会进入Executor组件（如果配置插件，会对Executor进行动态代理）的doQuery方法，这个方法会创建一个StatementHandler对象，此对象同时封装ParameterHandler和ResultSethandler对象，调用预编译逻辑，ParameterHandler给sql设置参数</li>
+<li>Executor组件有两个直接实现类，分别是BaseExecutor和 CachingExecutor。CachingExecutor静态代理了BaseExecutor。Executor 组件封装了Transction组件，Transction组件中又分装了Datasource组件。</li>
+<li>调用StatementHandler的增删改查方法获得结果，ResultSetHandler 对结果进行封装转换，请求结束。</li>
+<li>Executor、StatementHandler 、ParameterHandler、 ResultSetHandler，Mybatis的插件会对上面的四个组件进行动态代理。</li>
+</ul>
+
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
+        </div>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2021/10/29/Mybatis%20sql%E8%AF%AD%E5%8F%A5%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B%E5%88%86%E6%9E%90/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-      
-        </div></section>
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2020" class="archive-year">2020</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/04/23/%E5%AE%89%E8%A3%85zsh/" class="archive-article-date">
-  	<time datetime="2020-04-23T14:55:51.364Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-04-23</time>
-</a>
-        </div>
-    	 
+<nav id="article-nav">
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/04/23/%E5%AE%89%E8%A3%85zsh/">安装zsh</a>
-    </h1>
+    <a href="/2021/11/02/Jvm%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B%E5%92%8C%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          Jvm内存模型和类加载机制
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2020/04/23/%E5%AE%89%E8%A3%85zsh/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">安装zsh</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+  
+  
   
 
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
   
 
-    
+  
+
+  
 
 
           </div>
@@ -286,8 +368,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,
